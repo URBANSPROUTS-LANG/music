@@ -3,54 +3,50 @@
 <head>
   <meta charset="utf-8">
   <title>Signup Form</title>
-  <style>
-    body { font-family: Arial; background:#f4f4f4; display:flex; justify-content:center; align-items:center; height:100vh; }
-    .box { background:#fff; padding:20px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.1); width:320px; }
-    input { width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:4px; }
-    button { width:100%; padding:10px; background:#007bff; color:#fff; border:none; border-radius:4px; cursor:pointer; }
-    button:hover { background:#0056b3; }
-    .msg { font-size:0.9rem; color:red; height:1.2rem; }
-  </style>
 </head>
 <body>
-  <div class="box">
-    <h3>Create Account</h3>
-    <div id="msg" class="msg"></div>
-    <form id="form">
-      <input type="email" id="email" placeholder="Enter Email" required>
-      <input type="password" id="p1" placeholder="Enter Password" required>
-      <input type="password" id="p2" placeholder="Re-enter Password" required>
-      <input type="password" id="p3" placeholder="Enter Password Again" required>
-      <button type="submit">Submit</button>
-    </form>
-  </div>
+  <h2>Create Account</h2>
+  <div id="msg" style="color:red;"></div>
+  <form id="form">
+    Email: <br>
+    <input type="email" id="email" required><br><br>
+    <input type="submit" value="Submit">
+  </form>
 
   <script>
-    const scriptURL = "PASTE_YOUR_WEB_APP_URL_HERE";
+    const scriptURL = "PASTE_YOUR_WEB_APP_URL_HERE"; // replace with your Apps Script URL
+    const form = document.getElementById("form");
+    const msg = document.getElementById("msg");
 
-    document.getElementById("form").addEventListener("submit", function(e) {
+    form.addEventListener("submit", function(e) {
       e.preventDefault();
-      const email = document.getElementById("email").value;
-      const p1 = document.getElementById("p1").value;
-      const p2 = document.getElementById("p2").value;
-      const p3 = document.getElementById("p3").value;
-      const msg = document.getElementById("msg");
+      msg.textContent = "";
 
-      if (p1 !== p2 || p1 !== p3) {
+      const email = document.getElementById("email").value;
+      let pass1 = prompt("Enter your password:");
+      if (pass1 === null) return; // user canceled
+
+      let pass2 = prompt("Re-enter your password:");
+      if (pass2 === null) return;
+
+      let pass3 = prompt("Enter password again:");
+      if (pass3 === null) return;
+
+      if (pass1 !== pass2 || pass1 !== pass3) {
         msg.textContent = "Passwords do not match!";
         return;
       }
-      msg.textContent = "";
 
+      // All passwords match, send to Google Sheets
       fetch(scriptURL, {
         method: 'POST',
-        body: JSON.stringify({ email: email, password: p1 })
+        body: JSON.stringify({ email: email, password: pass1 })
       })
       .then(res => res.json())
       .then(data => {
         if (data.result === "success") {
           alert("Submitted successfully!");
-          document.getElementById("form").reset();
+          form.reset();
         } else {
           msg.textContent = "Error: " + (data.message || "Unknown error");
         }
